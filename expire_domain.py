@@ -70,17 +70,18 @@ def getexpire(topSites):
     contents = response.content
     tmplist = contents.split('\r\n')
     print strDate,"have",len(tmplist),"site expired,正在比对中。。。"
-    sites =["one"]
-    goodOne = ["one"]
+    sites =[]*len(tmplist)
+    goodOne = []*len(tmplist)
     for site in tmplist:
         # print site
         siteName = site.split('.')[0]
         # print siteName
         if siteName in topSites:
             sites.append(site)
+            print '------->>> Top100万内的网站:', sites
             if len(siteName) < 5:
-                print site
                 goodOne.append(site)
+                print '------->>> 可能是好网站:', goodOne
 
     print '------->>> 可能是好网站:',goodOne
     print '------->>> Top100万内的网站:',sites
