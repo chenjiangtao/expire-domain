@@ -3,6 +3,7 @@
 import MySQLdb
 import requests
 from datetime import date
+import sys
 
 
 def connectdb():
@@ -34,6 +35,8 @@ def querydb(tableName, db):
             desc = row[1]
             # 打印结果
             print "site: %s, desc: %s " % (site, desc)
+
+        print "查得数据%s条" % len(results)
     except:
         print "Error: unable to fecth data"
 
@@ -83,26 +86,24 @@ def get_expire_today():
     strDate = today.strftime("%Y/%m/%d")
     return strDate
 
+#
+# def get_tablename_today():
+#     today = date.today()
+#     strDate = today.strftime("%Y%m%d")
+#     return strDate
 
-def get_tablename_today():
-    today = date.today()
-    strDate = today.strftime("%Y%m%d")
-    return strDate
 
-
-def insert_site(site, desc, db):
+def insert_site(site, desc, db, tableName):
     cursor = db.cursor()
-    sql = "INSERT INTO `domain`.`{}`(`site`, `desc`) VALUES ('{}', '{}')".format(get_tablename_today(), site, desc)
+    sql = "INSERT INTO `domain`.`{}`(`site`, `desc`) VALUES ('{}', '{}')".format(tableName, site, desc)
     try:
         cursor.execute(sql)
         db.commit()
-        print 'insert site success'
     except:
         print 'insert site failed \n', sql
 
 
-def fetch_expired_site(topSites, db):
-    strDate = get_expire_today()
+def fetch_expired_site(topSites, strDate, db):
     url = 'https://expire.biz/' + strDate
     print '正在读取', url
     response = requests.get(url)
@@ -114,21 +115,25 @@ def fetch_expired_site(topSites, db):
     for site in tmplist:
         siteName = site.split('.')[0]
         if siteName in topSites:
-            insert_site(site, 'top100M', db)
+            insert_site(site, 'top100M', db, strDate)
             print 'top 100M', site
         if len(siteName) < 5:
-            insert_site(site, 'good', db)
-            print site
+            insert_site(site, 'good', db, strDate)
+            # print '.',
+            # sys.stdout.write('.')
 
 
 if __name__ == '__main__':
     db = connectdb()  # 连接MySQL数据库
 
-    is_created = create_expired_table(get_tablename_today(), db)
+    # 指定日期
+    d = get_expire_today()
+    # d = '2017/12/06'
+    is_created = create_expired_table(d, db)
     if is_created:
         topSites = get_top_sites(db)
-        fetch_expired_site(topSites, db)
+        fetch_expired_site(topSites, d, db)
 
-    querydb(get_tablename_today(), db)
+    querydb(d, db)
 
     closedb(db)  # 关闭数据库

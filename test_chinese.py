@@ -1,6 +1,9 @@
 #-*- coding:utf-8 -*-
 import random
 
+import sys
+
+
 def check_contain_chinese(check_str):
     for ch in check_str.decode('utf-8'):
         if u'\u4e00' <= ch <= u'\u9fff':
@@ -20,10 +23,12 @@ def iter_chinese():
 
 
 if __name__ == "__main__":
-    print check_contain_chinese('中国')
-    print check_contain_chinese('xxx')
-    print check_contain_chinese('xx中国')
-    iter_chinese()
-
+    # print check_contain_chinese('中国')
+    # print check_contain_chinese('xxx')
+    # print check_contain_chinese('xx中国')
+    # iter_chinese()
+    for i in range(100) :
+        # print '.',
+        sys.stdout.write('.')
 
 
